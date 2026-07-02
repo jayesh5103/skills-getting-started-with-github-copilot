@@ -18,14 +18,18 @@ client = TestClient(app_module.app)
 
 
 def test_unregister_participant_removes_from_activity():
-    response = client.delete(
-        "/activities/Chess%20Club/participants/michael%40mergington.edu"
-    )
+    # Arrange
+    activity_name = "Chess Club"
+    email = "michael@mergington.edu"
+    encoded_path = "/activities/Chess%20Club/participants/michael%40mergington.edu"
+    expected_message = "Unregistered michael@mergington.edu from Chess Club"
 
+    # Act
+    response = client.delete(encoded_path)
+
+    # Assert
     assert response.status_code == 200
-    assert response.json()["message"] == (
-        "Unregistered michael@mergington.edu from Chess Club"
-    )
+    assert response.json()["message"] == expected_message
 
     activities = client.get("/activities").json()
-    assert "michael@mergington.edu" not in activities["Chess Club"]["participants"]
+    assert email not in activities[activity_name]["participants"]
